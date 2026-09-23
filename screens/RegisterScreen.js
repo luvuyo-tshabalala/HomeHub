@@ -18,7 +18,7 @@ import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { auth, db } from '../firebase/firebaseConfig';
 
-export default function RegisterScreen({ navigation, onNavigateToLogin }) {
+export default function RegisterScreen({ navigation, onNavigateToLogin, onNavigateToFamilySetup }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -73,16 +73,19 @@ export default function RegisterScreen({ navigation, onNavigateToLogin }) {
         createAt: serverTimestamp(),
       });
 
-      Alert.alert(
-        'Success',
-        `Account created successfully for ${userCredential.user.email}!`,
-        [
-          {
-            text: 'OK',
-            onPress: () => handleGoToLogin(),
+      // Inside screens/RegisterScreen.js -> handleRegister:
+      Alert.alert('Success', 'Account created successfully! Next, establish or join a household', [
+        {
+          text: 'Continue',
+          onPress: () => {
+            if (navigation?.navigate) {
+              navigation.navigate('JoinFamily');
+            } else if (onNavigateToFamilySetup) {
+              onNavigateToFamilySetup();
+            }
           },
-        ]
-      );
+        },
+      ]);
 
     } catch (error) {
       let friendlyMessage = error.message;
